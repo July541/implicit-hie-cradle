@@ -7,8 +7,6 @@
 -- Initial differences can be found at https://github.com/mpickering/hie-bios/pull/178
 
 module Hie.Implicit.Cradle
-  ( loadImplicitHieCradle,
-  )
 where
 
 import Control.Applicative ((<|>))
@@ -27,12 +25,14 @@ import Hie.Yaml
 import System.Directory hiding (findFile)
 import System.FilePath
 import System.IO.Error (isPermissionError)
+import System.Process
 
 -- | Given root\/foo\/bar.hs, load an implicit cradle
 loadImplicitHieCradle :: FilePath -> IO (Cradle a)
 loadImplicitHieCradle wfile = do
   let wdir = takeDirectory wfile
   cfg <- runMaybeT (implicitConfig wdir)
+  print cfg
   return $ case cfg of
     Just bc -> getCradle absurd bc
     Nothing -> defaultCradle wdir
@@ -55,6 +55,7 @@ implicitConfig' fp =
     <|> (cabalExecutable >> (cabalProjectDir fp <|> cabalDistDir fp) >>= cabal)
     <|> (stackExecutable >> stackYamlDir fp >>= stack)
     <|> (cabalExecutable >> cabalFile fp >>= cabal)
+    <|> (noGhcExecutable >> stackExecutable >> findStackGlobal >>= stack)
   where
     readPkgs f gp p = do
       cfs <- gp p
@@ -73,6 +74,16 @@ implicitConfig' fp =
     stackComponent' n c = flip StackType Nothing . Just <$> stackComponent n c
 
 ------------------------------------------------------------------------
+
+revMaybe :: Maybe a -> Maybe a
+revMaybe Nothing = Just undefined
+revMaybe (Just _) = Nothing
+
+findStackGlobal :: MaybeT IO FilePath
+findStackGlobal = MaybeT $ pure <$> readProcess "stack" ["path", "--config-location"] ""
+
+noGhcExecutable :: MaybeT IO FilePath
+noGhcExecutable = MaybeT $ revMaybe <$> findExecutable "ghc"
 
 cabalExecutable :: MaybeT IO FilePath
 cabalExecutable = MaybeT $ findExecutable "cabal"
