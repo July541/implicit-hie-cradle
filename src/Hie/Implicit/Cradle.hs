@@ -83,7 +83,7 @@ revMaybe Nothing = Just undefined
 revMaybe (Just _) = Nothing
 
 findStackGlobal :: MaybeT IO FilePath
-findStackGlobal = MaybeT $ pure <$> readProcess "stack" ["path", "--config-location"] ""
+findStackGlobal = MaybeT $ pure . init <$> readProcess "stack" ["path", "--config-location"] ""
 
 noGhcExecutable :: MaybeT IO FilePath
 noGhcExecutable = MaybeT $ revMaybe <$> findExecutable "ghc"
