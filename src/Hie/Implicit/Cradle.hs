@@ -84,10 +84,10 @@ revMaybe (Just _) = Nothing
 
 findStackGlobal :: MaybeT IO FilePath
 -- findStackGlobal = MaybeT $ pure . init <$> readProcess "stack" ["path", "--config-location"] ""
-findStackGlobal = MaybeT $ pure $ pure "/home/treee/.stack/global-project/stack.yaml"
+findStackGlobal = MaybeT $ pure $ pure "/home/treee/.stack/global-project/"
 
 noGhcExecutable :: MaybeT IO FilePath
-noGhcExecutable = MaybeT $ revMaybe <$> findExecutable "ghc"
+noGhcExecutable = MaybeT $ findExecutable "ghc"
 
 cabalExecutable :: MaybeT IO FilePath
 cabalExecutable = MaybeT $ findExecutable "cabal"
