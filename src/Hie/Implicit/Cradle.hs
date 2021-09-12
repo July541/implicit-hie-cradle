@@ -26,13 +26,14 @@ import System.Directory hiding (findFile)
 import System.FilePath
 import System.IO.Error (isPermissionError)
 import System.Process
+import System.IO
 
 -- | Given root\/foo\/bar.hs, load an implicit cradle
 loadImplicitHieCradle :: FilePath -> IO (Cradle a)
 loadImplicitHieCradle wfile = do
   let wdir = takeDirectory wfile
   cfg <- runMaybeT (implicitConfig wdir)
-  print cfg
+  hPutStrLn stderr $ "\n\nrun in implicit cradle: " <> show cfg
   return $ case cfg of
     Just bc -> getCradle absurd bc
     Nothing -> defaultCradle wdir
