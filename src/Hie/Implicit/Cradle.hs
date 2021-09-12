@@ -33,7 +33,9 @@ loadImplicitHieCradle :: FilePath -> IO (Cradle a)
 loadImplicitHieCradle wfile = do
   let wdir = takeDirectory wfile
   cfg <- runMaybeT (implicitConfig wdir)
-  hPutStrLn stderr $ "\n\nrun in implicit cradle: " <> show cfg
+  h <- openFile "out.res" WriteMode
+  hPutStrLn h $ "\n\nrun in implicit cradle: " <> show cfg
+  hClose h
   return $ case cfg of
     Just bc -> getCradle absurd bc
     Nothing -> defaultCradle wdir
