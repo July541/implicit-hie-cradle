@@ -87,7 +87,7 @@ findStackGlobal :: MaybeT IO FilePath
 findStackGlobal = MaybeT $ pure $ pure "/home/treee/.stack/global-project/"
 
 noGhcExecutable :: MaybeT IO FilePath
-noGhcExecutable = MaybeT $ findExecutable "ghc"
+noGhcExecutable = MaybeT $ revMaybe <$> findExecutable "ghc"
 
 cabalExecutable :: MaybeT IO FilePath
 cabalExecutable = MaybeT $ findExecutable "cabal"
