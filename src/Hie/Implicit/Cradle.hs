@@ -38,7 +38,7 @@ loadImplicitHieCradle wfile = do
   hClose h
   return $ case cfg of
     Just bc -> getCradle absurd bc
-    Nothing -> defaultCradle wdir
+    -- Nothing -> defaultCradle wdir
 
 implicitConfig :: FilePath -> MaybeT IO (CradleConfig a, FilePath)
 implicitConfig fp = do
